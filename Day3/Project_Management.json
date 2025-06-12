@@ -1,0 +1,164 @@
+{
+  "name": "Project Management",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        0
+      ],
+      "id": "aa804b32-fd21-4544-854c-8817c14f7ae0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1-9iK9ZC91dX1ga8u3Jnj5oZ0pYHcpu5WyhAfhWK1GX4/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-9iK9ZC91dX1ga8u3Jnj5oZ0pYHcpu5WyhAfhWK1GX4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -160,
+        20
+      ],
+      "id": "a242b26e-bf16-4f08-856c-7b45a092d042",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7I2nwBv8oN4L9qRE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an AI assistant helping a Project Manager track and manage post-meeting action items submitted by team members through a form.\n\nHere is the submitted action item entry:\n\nName: {{ $json.Name }}\n\nEmail: {{ $json.Email }}\n\nWhat will you do today? {{ $json['What will you do today?'] }} \nAny blockers? {{ $json['Any blockers?'] }}\n\nUrgency Level: {{ $json['Urgency Level'] }}\nTimestamp: {{ $json.Timestamp }}\n\nYour tasks:\nSummarize the team member's planned action in one concise sentence.\n\nIdentify if any blockers are reported. If yes, propose action steps to resolve them.\n\nEvaluate urgency level and recommend if this task needs to be escalated to the Project Manager.\n\nOutput your response in the following format:",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        60,
+        20
+      ],
+      "id": "c16aa459-356b-4d2a-a7ae-e53327d44dff",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        100,
+        240
+      ],
+      "id": "d24b0ae2-62f0-46d9-864d-514006aba782",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xrOrXomavFyTxkUR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets').item.json.Email }}",
+        "subject": "Project management",
+        "emailType": "text",
+        "message": "Certainly, here's a **professional email** you can use to report or seek support regarding the error you encountered with the Google Gemini Chat Model in **n8n**:  ---  ### **Subject:** Request for Support – Google Gemini Chat Model Integration Error in n8n  **Dear Support Team,**  I hope this message finds you well.  I am currently integrating the Google Gemini Chat Model into an **n8n workflow** to automate post-meeting action item tracking. However, I am encountering the following error during execution:  > **“The resource you are requesting could not be found.”**  This error occurs when executing the AI Agent step configured to use the Gemini model. I have verified the following:  * A valid API key from [Google AI Studio](https://makersuite.google.com/app/apikey) has been generated and added. * The chat model name is correctly set as `gemini-1.5-pro-latest`. * The project is active and authorized for Generative AI APIs. * I am operating within supported limits and regions.  Despite these checks, the issue persists.  I would appreciate your assistance in resolving this issue. Please let me know if you require any logs, configuration screenshots, or credentials (via a secure channel) for troubleshooting.  Thank you in advance for your support.  **Best regards,** Dr. S. Muthu Vijaya Pandian Professor & Senior Innovator SNS College of Engineering Email: \\[your email] Phone: \\[your contact number]  ---  Let me know if you'd like to customize this email further for Google support, n8n team, or internal IT.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        420,
+        20
+      ],
+      "id": "028b71b6-424f-46f9-871c-a8df7dec211b",
+      "name": "Gmail",
+      "webhookId": "710cd136-a842-4f37-b1ff-7cefba39880b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xiCrqtA8UvvwrJ8c",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "810dcebb-342a-4ac0-ba1d-93b4b905617c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f6612093f7ca42a7ef15fff4a68df5b17da8c082c46107a644b02f4e7daf393"
+  },
+  "id": "kFHJ0jUDfgkNRwLZ",
+  "tags": []
+}
