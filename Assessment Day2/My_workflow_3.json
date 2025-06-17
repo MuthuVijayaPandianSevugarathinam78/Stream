@@ -1,0 +1,645 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -540,
+        -80
+      ],
+      "id": "5968dcfa-f41d-4e28-83e6-14f1c2b2bf80",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1nam7ublOLwRIlAM5LT1wpZSnOOzReIO7jluXwxMEJ2I",
+          "mode": "list",
+          "cachedResultName": "2025 SNS Institutions IPR Details (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nam7ublOLwRIlAM5LT1wpZSnOOzReIO7jluXwxMEJ2I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 419190662,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nam7ublOLwRIlAM5LT1wpZSnOOzReIO7jluXwxMEJ2I/edit#gid=419190662"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -320,
+        -80
+      ],
+      "id": "e91621c2-d6a1-4c5b-9817-66b3e588ff2f",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7I2nwBv8oN4L9qRE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Dear {{ $json[\"List of Inventors/Applicants in the Patent\"] }},\n\nWe have reviewed your patent application submitted on {{ $json[\"Date\"] }} with the following details:\n{{ $json['Name of the Inventor/Applicant [Dr/Mr/Ms]'] }}\n- Inventor/Applicant: \n- Designation: {{ $json[\"Designation\"] }}\n- Institution: {{ $json[\"Name of the Institutions\"] }}\n- Department: {{ $json[\"Department\"] }}\n- IPR Filing Country: {{ $json[\"IPR Filing Country\"] }}\n- Patent Type: {{ $json[\"IPR Type\"] }}\n- Application Number: {{ $json['Application No:'] }}\n- Patent Status: {{ $json[\"Patent Status\"] }}\n- Filed/Published/Granted Date: {{ $json[\"Filed /Published / Granted Date\"] }}\n\nKindly ensure that the attached document is accessible and contains all the required forms. If any documents are missing or incomplete, please re-upload the complete set using the following link:{{ $json['Attach Proof of Filed/Granted/Published Certificate'] }}\n\n\nRegards,  \nIPR Cell\n\nRefactor the above mail format to the applicant's need.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        -80
+      ],
+      "id": "ee0c393b-cd56-4303-ac61-08346d00fbf0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        140
+      ],
+      "id": "1d230927-3f8b-4f3a-a262-376072a182e5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "lTqoijykNgme3DBu",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Patent Forms-17.06.25",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        60,
+        140
+      ],
+      "id": "f8bc8e95-6736-486f-9598-8ce2ff45edca",
+      "name": "Google Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gL0baWFv7aTnQflY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        640,
+        380
+      ],
+      "id": "c8026fee-9096-4382-b2d0-c226e097830e",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        460
+      ],
+      "id": "11b1f055-7e87-49f0-97d4-4399bd52c3c3",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xrOrXomavFyTxkUR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets').item.json['Email Address'] }}",
+        "subject": "Patent forms status intimation",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        280,
+        -80
+      ],
+      "id": "202680c8-c189-4a8b-ae2b-6ce29ef8c253",
+      "name": "Gmail",
+      "webhookId": "cd1370e6-f9de-4a7c-9ab4-8bc239efa181",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xiCrqtA8UvvwrJ8c",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        40
+      ],
+      "id": "9d0a53d8-451b-4ac0-b875-87902c14119f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee0cf14e-3db6-4f0d-8911-e36b28e03d48",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "=Valid",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "8b2d6f24-9b09-430b-91c8-38a2efa18f44",
+              "leftValue": "=\n",
+              "rightValue": "Rejected",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1640,
+        0
+      ],
+      "id": "42e81768-0147-4fd4-9218-d170a5dc4eea",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop through the array and clean each output\nconst allValid = items.every(item => {\n  const text = item.json.output?.trim();\n  return text === \"Valid\";\n});\n\n// Return single result\nreturn [\n  {\n    json: {\n      result: allValid ? \"Valid\" : \"Invalid\"\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        0
+      ],
+      "id": "f9406bd1-f00b-4464-89c9-8c551af30e34",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "sendTo": "mvpeeehod@gmail.com",
+        "subject": "Rejection of Patent Submission",
+        "emailType": "text",
+        "message": "=Your submission is rejected due to inavlid patent forms.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2140,
+        200
+      ],
+      "id": "a963939b-23b1-4cc5-b6ab-a05214ad4648",
+      "name": "Gmail1",
+      "webhookId": "050dc255-25cd-42d6-8604-79d022b356ae",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xiCrqtA8UvvwrJ8c",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets1').item.json.Email }}",
+        "subject": "General Instructions for Filling out Patent Forms",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2060,
+        360
+      ],
+      "id": "0bff1c84-27e4-493c-afbf-7c615418b641",
+      "name": "Gmail2",
+      "webhookId": "a0af66c0-b1f9-41cf-8e46-b6c184f5035c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xiCrqtA8UvvwrJ8c",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1A34yhA2MNPpNRQlOMNBpyQsiydlt4vludQIX1Ewc5cg",
+          "mode": "list",
+          "cachedResultName": "Patent submission form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1A34yhA2MNPpNRQlOMNBpyQsiydlt4vludQIX1Ewc5cg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1A34yhA2MNPpNRQlOMNBpyQsiydlt4vludQIX1Ewc5cg/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        660,
+        40
+      ],
+      "id": "34bfe146-e6ac-42b0-85dc-f9a2cad847c0",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "7I2nwBv8oN4L9qRE",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a patent verification assistant.\n\nYour task is to verify the correctness of the patent form located at the following link: {{ $json[\"Drive Link\"] }}\n\nCheck if the form is correctly filled as per standard patent submission guidelines of Indian Patent Office.\n\nRespond with ONLY one word:\n- \"Valid\" → if the form is correctly filled\n- \"Invalid\" → if the form is incomplete, incorrect, or non-compliant\n\nDo not explain your answer. Do not provide any other text or comments. The output must be exactly either: Valid or Invalid.\n\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        20
+      ],
+      "id": "89aca79c-97b4-4f36-ab4f-61bbb3e78ce8",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        220
+      ],
+      "id": "5ee76139-cb1b-4d9e-9b2b-d91a48e244bd",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xrOrXomavFyTxkUR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Upcoming Patent Filing Deadline – Action Required Body:",
+        "emailType": "text",
+        "message": "=Dear Dr. Kumar,  This is a gentle reminder regarding your ongoing patent application process. 🔹 Checklist Item: Form-2 (Complete Specification) 🔹 Deadline: June 20, 2025 🔹 Current Status: Pending  📌 Next Action: Submit Form-2 with complete specification via IP India Portal.  Thank you, Patent Support System. If you are facing  any difficulties while filing the patent &  any legal support do you want means kindly contact my mail id: muthu.s.cfc@snsgroups.com ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1940,
+        0
+      ],
+      "id": "2a89a889-1011-4a9a-aedc-f36aed8acf5f",
+      "name": "Gmail3",
+      "webhookId": "4bcf1185-10de-4c10-a515-4a9aa81b7d90",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xiCrqtA8UvvwrJ8c",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert patent assistant.\n\nYour job is to explain complex legal jargon in simple language to inventors and guide them on what actions to take next in the patent filing process.\n\nRespond clearly, concisely, and helpful\n\n1. Explain what this item means in simple, non-legal terms.\n2. Describe why it is important in the patent filing process.\n3. Suggest what action the inventor should take next.\n4. If the item is highly legal or technical, recommend consulting a verified patent agent or legal expert.\n\nKeep the response short (3–5 sentences), informative, and easy to understand. yout taks is to output thge steps to fill Form 1, 3 and 5 of Indian Patent Office.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1700,
+        360
+      ],
+      "id": "b3e9e791-8832-4633-8c2c-09bc334b0a7f",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1380,
+        380
+      ],
+      "id": "322ee1d1-21c4-4744-8812-a143ffaff1f5",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xrOrXomavFyTxkUR",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "get",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ $('Google Sheets1').item.json['Drive Link'] }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTool",
+      "typeVersion": 3,
+      "position": [
+        1220,
+        240
+      ],
+      "id": "9f01cd46-2fa7-485e-b9c7-e9e476d46676",
+      "name": "Google Drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "gL0baWFv7aTnQflY",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        []
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "809f8fa4-47e0-4ecb-adb4-3e7cd8e4167d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f6612093f7ca42a7ef15fff4a68df5b17da8c082c46107a644b02f4e7daf393"
+  },
+  "id": "8Y6ejkgcybNkNTND",
+  "tags": []
+}
